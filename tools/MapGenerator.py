@@ -2,22 +2,17 @@
 # WARNING: DELETE EVERYTHING OF THE MAPS, IF THEY ALREARY EXIST !!!!!!!!!!!!!!!!
 
 import json
-import os 
-
-def padZero(value):
-    value_str = str(value)
-    while len(value_str) < 3:
-        value_str = '0' + value_str
-    return value_str
+from __Common import padZero
+from __Common import data_path
 
 def create_parent_map(letter):
     global map_id
-    global save_path
+    global data_path
     global order
     
     map_file_name = "Map" + padZero(map_id)
     map_name = letter
-    map_file_name_full = str(save_path +"\\"+ map_file_name +".json")
+    map_file_name_full = str(data_path +"\\"+ map_file_name +".json")
     with open(map_file_name_full, 'w+') as data:
         data.write(map_data) 
         
@@ -40,16 +35,14 @@ map_info_template = {
           "scrollY": 0
      }
 
-path = "F:\\MyGame\\RPGMAKER_MV_GAME\\data\\"
-save_path = path 
 
 map_data = ""
-with open(path + "Map003.json", 'r') as data:
+with open(data_path + "Map003.json", 'r') as data:
         map_data = data.read()
 map_data_dic = json.loads(map_data)
 
 map_info_data = ""
-with open(path + "MapInfosTemplate.json", 'r') as data:
+with open(data_path + "MapInfosTemplate.json", 'r') as data:
         map_info_data = data.read()
 map_info_data_dic = json.loads(map_info_data)
 
@@ -63,7 +56,7 @@ for l in range(ord('A'), ord('Z')+1):
     for i in range(26):
         map_file_name = "Map" + padZero(map_id)
         map_name = chr(l) + str(i)
-        map_file_name_full = str(save_path +"\\"+ map_file_name +".json")
+        map_file_name_full = str(data_path +"\\"+ map_file_name +".json")
         map_data_dic["note"] = map_name
         map_data_dic["displayName"] = map_name
         map_data = json.dumps(map_data_dic)
@@ -87,5 +80,5 @@ for l in range(ord('A'), ord('Z')+1):
 #  Generate Parent Letter 
 
 map_info_data = json.dumps(map_info_data_dic, indent=5)
-with open(path + "MapInfos.json", 'w+') as data:
+with open(data_path + "MapInfos.json", 'w+') as data:
     data.write(map_info_data)

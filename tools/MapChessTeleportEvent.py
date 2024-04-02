@@ -138,8 +138,9 @@ class NavigationIterator:
 
 def remove_teleport_events(__events: list):
   to_delete = []
+  detect_names = ["Teleport_Event_LeftToRight", "Teleport_Event_RightToLeft","Teleport_Event_TopToBottom","Teleport_Event_BottomToTop"]
   for event in __events:
-    if event and "Teleport_Event" in event["name"]:
+    if event and event["name"] in detect_names:
       to_delete.append(event)
   for event in to_delete:
     __events.remove(event)
