@@ -2,50 +2,6 @@ import json
 import copy
 import os 
 
-def padZero(value):
-  value_str = str(value)
-  while len(value_str) < 3:
-      value_str = '0' + value_str
-  return value_str
-
-class NavMapData:
-    def __init__(self, _map_id, name, _x, _y):
-        self.map_id = _map_id
-        self.map_id_pad = padZero(_map_id)
-        self.file_name = f'Map{self.map_id_pad}.json'
-        self.name = name
-        self.x = _x
-        self.y = _y
-        
-class Navigation:
-    def __init__(self):
-        self.init_member()
-
-    def init_member(self):
-        self.map_height = 17
-        self.map_width = 13
-        self.area_count_x = 26
-        self.area_count_y = ord('Z') - ord('A') + 1
-
-        map_id = 0  # add with +4, because the MapId Begins with 4
-        self._map = []
-        letter = ord('A') - 1
-        for y in range(self.area_count_y):
-            map_id += 1
-            letter += 1
-            self._map.append([])
-            for x in range(self.area_count_x):
-                name = chr(letter) + str(x)
-                self._map[y].append(NavMapData(map_id + 4, name, x,y))
-                map_id += 1
-
-    def get(self, x, y)-> NavMapData:
-        if x < 0 or x > self.area_count_x or y < 0 or y > self.area_count_y:
-          return None
-        return self._map[y][x]
-
-navigation = Navigation()
-
 teleport_event = {
       "id": 1,
       "name": "Teleport_Event",
@@ -113,6 +69,72 @@ teleport_event = {
       "x": 0,
       "y": 1
     }
+
+def padZero(value):
+  value_str = str(value)
+  while len(value_str) < 3:
+      value_str = '0' + value_str
+  return value_str
+
+class NavMapData:
+    def __init__(self, _map_id, name, _x, _y):
+        self.map_id = _map_id
+        self.map_id_pad = padZero(_map_id)
+        self.file_name = f'Map{self.map_id_pad}.json'
+        self.name = name
+        self.x = _x
+        self.y = _y
+        
+class Navigation:
+    def __init__(self):
+        self.init_member()
+
+    def init_member(self):
+        self.map_height = 17
+        self.map_width = 13
+        self.area_count_x = 26
+        self.area_count_y = ord('Z') - ord('A') + 1
+
+        map_id = 0  # add with +4, because the MapId Begins with 4
+        self._map = []
+        letter = ord('A') - 1
+        for y in range(self.area_count_y):
+            map_id += 1
+            letter += 1
+            self._map.append([])
+            for x in range(self.area_count_x):
+                name = chr(letter) + str(x)
+                self._map[y].append(NavMapData(map_id + 4, name, x,y))
+                map_id += 1
+
+    def get(self, x, y)-> NavMapData:
+        if x < 0 or x > self.area_count_x or y < 0 or y > self.area_count_y:
+          return None
+        return self._map[y][x]
+      
+    def __iter__(self):
+        return NavigationIterator(self)
+
+class NavigationIterator:
+    def __init__(self, navigation):
+        self.navigation = navigation
+        self.x = 0
+        self.y = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.y >= self.navigation.area_count_y:
+            raise StopIteration
+
+        result = self.navigation.get(self.x, self.y)
+        self.x += 1
+        if self.x >= self.navigation.area_count_x:
+            self.x = 0
+            self.y += 1
+
+        return result
 
 def remove_teleport_events(__events: list):
   to_delete = []
@@ -189,30 +211,31 @@ def get_code(event):
  
 width = 17
 height = 13
-
-events_count = (width * 2 + height * 2) - 8
-# left- right- up- down
-events = [copy.deepcopy(teleport_event) for _ in range(events_count)]
-navData = navigation.get(0,0)
-set_events_data(events, navData)
-events.insert(0,None)
-
 path = "F:\\MyGame\\RPGMAKER_MV_GAME\\data\\"
 json_data = None
+navigation = Navigation()
 
-file = path + navData.file_name
+for navData in navigation:
+  events_count = (width * 2 + height * 2) - 8
+  # left- right- up- down
+  events = [copy.deepcopy(teleport_event) for _ in range(events_count)]
+  set_events_data(events, navData)
+  events.insert(0,None)
 
-json_string = ""
-with open(file, 'r') as data: 
-    json_string = data.read()
+
+  file = path + navData.file_name
+
+  json_string = ""
+  with open(file, 'r') as data: 
+      json_string = data.read()
+      
+  json_data = json.loads(json_string)
+  remove_teleport_events(json_data["events"])
+  remove_empty_teleport_events(events)
+  for event in events:
+    json_data["events"].append(event)
     
-json_data = json.loads(json_string)
-remove_teleport_events(json_data["events"])
-remove_empty_teleport_events(events)
-for event in events:
-  json_data["events"].append(event)
-  
-json_string = json.dumps(json_data, indent=5)
-with open(file, 'w') as data:
-    data.write(json_string)
+  json_string = json.dumps(json_data, indent=5)
+  with open(file, 'w') as data:
+      data.write(json_string)
 
