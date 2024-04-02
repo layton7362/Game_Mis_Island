@@ -1,11 +1,21 @@
 import json
 import os 
 
-class NavMapData:
-    def __init__(self, _map_id, name):
-        self.map_id = _map_id
-        self.name = name
+def padZero(value):
+  value_str = str(value)
+  while len(value_str) < 3:
+      value_str = '0' + value_str
+  return value_str
 
+class NavMapData:
+    def __init__(self, _map_id, name, _x, _y):
+        self.map_id = _map_id
+        self.map_id_pad = padZero(_map_id)
+        self.file_name = f'Map{self.map_id_pad}.json'
+        self.name = name
+        self.x = _x
+        self.y = _y
+        
 class Navigation:
     def __init__(self):
         self.init_member()
@@ -25,7 +35,7 @@ class Navigation:
             self._map.append([])
             for x in range(self.area_count_x):
                 name = chr(letter) + str(x)
-                self._map[y].append(NavMapData(map_id + 4, name))
+                self._map[y].append(NavMapData(map_id + 4, name, x,y))
                 map_id += 1
 
     def get(self, x, y):
@@ -34,7 +44,6 @@ class Navigation:
         return self._map[x][y]
 
 nav = Navigation()
-res = nav.get(2,2)
 
 teleport_event = {
       "id": 1,
@@ -113,39 +122,52 @@ def remove_teleport_events(__events):
       pass
   pass
 
-def set_events_positions(events):
+def set_events_data(events, nav):
     global height
     global width
     
     i = 0
-    for y in range(1,height-1):
-        set_event_position(0,y, events[i])
+    nav_data_left = nav.get(x-1,y)  
+    nav_data_right = nav.get(x+1,y)  
+    nav_data_top = nav.get(x,y+1)  
+    nav_data_bottom = nav.get(x,y-1)  
+    
+    for event_y in range(1,height-1):
+        set_event_position(0,event_y, events[i])
         events[i]["name"] += "_LeftToRight"
-        # set_event_params()
+        set_event_params(nav_data_right,width-1,event_y, events[i])
         i += 1
         
-    for y in range(1,height-1):
-        set_event_position(width-1,y, events[i])
+    event_x = width
+    for event_y in range(1,height-1):
+        set_event_position(width-1,event_y, events[i])
         events[i]["name"] += "_RightToLeft"
+        set_event_params(nav_data_left,0,event_y, events[i])
         i += 1
     
-    for x in range(1,width-1):
-        set_event_position(x,0, events[i])
+    for event_x in range(1,width-1):
+        set_event_position(event_x,0, events[i])
         events[i]["name"] += "_TopToBottom"
+        set_event_params(nav_data_bottom,event_x,height-1, events[i])
         i += 1
-        
-    for x in range(1,width-1):
-        set_event_position(x,height-1, events[i])
+    
+    event_y = height
+    for event_x in range(1,width-1):
+        set_event_position(event_x,height-1, events[i])
         events[i]["name"] += "_BottomToTop"
+        set_event_params(nav_data_top,event_x,0, events[i])
         i += 1
                 
 def set_event_position(x,y, event):
     event["x"] = x
     event["y"] = y
 
-def set_event_params(map_id, x, y, event):
-    code = f'$gamePlayer.reserveTransferMoveMap({map_id},{x},{y});'
-    event["pages"][0]["list"][0]["parameters"] = code
+def set_event_params(nav, x, y, event):
+  if nav:
+    code = f'$gamePlayer.reserveTransferMoveMap({nav.map_id},{x},{y});'
+  else:
+    code = ""
+  event["pages"][0]["list"][0]["parameters"] = code
 
 def top(_map_id):
   _map_id += 1
@@ -182,15 +204,14 @@ diff = end_map_id - start_map_id
 events_count = width * 2 + height * 2
 events_count -= 4
 # left- right- up- down
-
 events = [teleport_event.copy() for i in range(events_count)]
-set_events_positions(events)
+set_events_data(events, 6)
 events.insert(0,None)
 
 path = "F:\\MyGame\\RPGMAKER_MV_GAME\\data\\"
 json_data = None
 
-file = path + "Map004.json"
+file = path + "Map006.json"
 
 with open(file, 'r') as data: 
     json_string = data.read()
