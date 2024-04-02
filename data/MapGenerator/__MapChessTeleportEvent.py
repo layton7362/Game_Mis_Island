@@ -1,4 +1,5 @@
 import json
+import copy
 import os 
 
 def padZero(value):
@@ -38,12 +39,12 @@ class Navigation:
                 self._map[y].append(NavMapData(map_id + 4, name, x,y))
                 map_id += 1
 
-    def get(self, x, y):
+    def get(self, x, y)-> NavMapData:
         if x < 0 or x > self.area_count_x or y < 0 or y > self.area_count_y:
           return None
-        return self._map[x][y]
+        return self._map[y][x]
 
-nav = Navigation()
+navigation = Navigation()
 
 teleport_event = {
       "id": 1,
@@ -79,7 +80,7 @@ teleport_event = {
               "code": 355,
               "indent": 0,
               "parameters": [
-                "$gamePlayer.reserveTransferMoveMap(id, x, y);"
+                "$gamePlayer.reserveTransforMoveMap(id, x, y);"
               ]
             },
             {
@@ -113,24 +114,37 @@ teleport_event = {
       "y": 1
     }
 
-def remove_teleport_events(__events):
+def remove_teleport_events(__events: list):
+  to_delete = []
   for event in __events:
     if event and "Teleport_Event" in event["name"]:
-      __events.remove(event)
-      pass
-    else:
-      pass
+      to_delete.append(event)
+  for event in to_delete:
+    __events.remove(event)
+  if len(__events) == 1:
+    __events.clear()
   pass
 
-def set_events_data(events, nav):
+def remove_empty_teleport_events(events: list):
+  remove_events = []
+  for event in events:
+    if event and get_code(event) == "":
+      remove_events.append(event)
+      pass
+  for event in remove_events:
+    events.remove(event)
+  if len(events) == 1:
+    events.clear()
+
+def set_events_data(events, nav : NavMapData):
     global height
     global width
     
     i = 0
-    nav_data_left = nav.get(x-1,y)  
-    nav_data_right = nav.get(x+1,y)  
-    nav_data_top = nav.get(x,y+1)  
-    nav_data_bottom = nav.get(x,y-1)  
+    nav_data_left = navigation.get(nav.x+1,nav.y)  
+    nav_data_right = navigation.get(nav.x-1,nav.y)  
+    nav_data_top = navigation.get(nav.x,nav.y+1)  
+    nav_data_bottom = navigation.get(nav.x,nav.y-1)  
     
     for event_y in range(1,height-1):
         set_event_position(0,event_y, events[i])
@@ -162,67 +176,43 @@ def set_event_position(x,y, event):
     event["x"] = x
     event["y"] = y
 
-def set_event_params(nav, x, y, event):
-  if nav:
-    code = f'$gamePlayer.reserveTransferMoveMap({nav.map_id},{x},{y});'
+def set_event_params(data: NavMapData, x, y, event):
+  if data:
+    code = f'$gamePlayer.reserveTransforMoveMap({data.map_id},{x},{y});'
+    event["pages"][0]["list"][0]["parameters"][0] = code
   else:
-    code = ""
-  event["pages"][0]["list"][0]["parameters"] = code
-
-def top(_map_id):
-  _map_id += 1
-  if _map_id < width:
-    return _map_id
-  return None
-
-def bottom(_map_id):
-  _map_id -= 1
-  if _map_id >= 0:
-    return _map_id
-  return None
-
-def right(_map_id):
+    event["pages"][0]["list"][0]["parameters"][0] = ""
   pass
 
-def left(_map_id):
-  _map_id -= 1
-  if _map_id >= 0:
-    return _map_id
-  return None
-
-def ignore(_map_id):
-  pass
-
+def get_code(event):
+   return event["pages"][0]["list"][0]["parameters"][0]
+ 
 width = 17
 height = 13
 
-# A = 4, B = 31
-start_map_id = 5
-end_map_id = 30
-diff = end_map_id - start_map_id
-
-events_count = width * 2 + height * 2
-events_count -= 4
+events_count = (width * 2 + height * 2) - 8
 # left- right- up- down
-events = [teleport_event.copy() for i in range(events_count)]
-set_events_data(events, 6)
+events = [copy.deepcopy(teleport_event) for _ in range(events_count)]
+navData = navigation.get(0,0)
+set_events_data(events, navData)
 events.insert(0,None)
 
 path = "F:\\MyGame\\RPGMAKER_MV_GAME\\data\\"
 json_data = None
 
-file = path + "Map006.json"
+file = path + navData.file_name
 
+json_string = ""
 with open(file, 'r') as data: 
     json_string = data.read()
-    json_data = json.loads(json_string)
     
-    remove_teleport_events(json_data["events"])
-    
-    for event in events:
-      json_data["events"].append(event)
+json_data = json.loads(json_string)
+remove_teleport_events(json_data["events"])
+remove_empty_teleport_events(events)
+for event in events:
+  json_data["events"].append(event)
   
+json_string = json.dumps(json_data, indent=5)
 with open(file, 'w') as data:
-    json_string = json.dumps(json_data, indent=5)
     data.write(json_string)
 

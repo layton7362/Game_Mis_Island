@@ -62,6 +62,7 @@ for l in range(ord('A'), ord('Z')+1):
         map_name = chr(l) + str(i)
         map_file_name_full = str(save_path +"\\"+ map_file_name +".json")
         map_data_dic["note"] = map_name
+        map_data_dic["displayName"] = map_name
         map_data = json.dumps(map_data_dic)
         with open(map_file_name_full, 'w+') as data:
             data.write(map_data)

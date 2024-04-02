@@ -7457,7 +7457,7 @@ Game_Player.prototype.isStopping = function() {
     return Game_Character.prototype.isStopping.call(this);
 };
 
-Game_Player.prototype.reserveTransferMoveMap = function(mapId, x, y, d, fadeType) {
+Game_Player.prototype.reserveTransforMoveMap = function(mapId, x, y, d, fadeType) {
     this.reserveTransfer(mapId, x, y, d, fadeType)
 };
 
