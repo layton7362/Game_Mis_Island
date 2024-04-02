@@ -2,39 +2,25 @@
 # WARNING: DELETE EVERYTHING OF THE MAPS, IF THEY ALREARY EXIST !!!!!!!!!!!!!!!!
 
 import json
-from __Common import padZero
-from __Common import data_path
+from __Common import padZero, MAP_PREFIX
+from __Common import DATA_PATH as data_path
+from __DataTemplate import MAP_INFO
 
 def create_parent_map(letter):
-    global map_id
-    global data_path
-    global order
     
-    map_file_name = "Map" + padZero(map_id)
+    map_file_name = MAP_PREFIX + padZero(map_id)
     map_name = letter
-    map_file_name_full = str(data_path +"\\"+ map_file_name +".json")
+    map_file_name_full = str(data_path + map_file_name +".json")
     with open(map_file_name_full, 'w+') as data:
         data.write(map_data) 
         
-    map_info = map_info_template.copy()
+    map_info = MAP_INFO.copy()
     map_info["name"] = map_name
     map_info["id"] = map_id
     map_info["parentId"] = 2
     map_info["order"] = order
     
-    map_info_data_dic.append(map_info)
-            
-        
-map_info_template = {
-          "id": -1,
-          "expanded": False,
-          "name": "MAP006",
-          "order": 6,
-          "parentId": 5,
-          "scrollX": 0,
-          "scrollY": 0
-     }
-
+    map_info_data_dic.append(map_info)    
 
 map_data = ""
 with open(data_path + "Map003.json", 'r') as data:
@@ -63,7 +49,7 @@ for l in range(ord('A'), ord('Z')+1):
         with open(map_file_name_full, 'w+') as data:
             data.write(map_data)
             
-        map_info = map_info_template.copy()
+        map_info = MAP_INFO.copy()
         map_info["name"] = map_name
         map_info["order"] = order
         map_info["id"] = map_id

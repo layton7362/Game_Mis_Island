@@ -1,7 +1,7 @@
 from typing import List
 import copy 
 
-# Generate the overworld Tilemap
+# Generate the overworld tilemap
 
 class Canvas:
     def __init__(self,x,y,w,h) -> None:
