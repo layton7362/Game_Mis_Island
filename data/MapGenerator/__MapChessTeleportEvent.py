@@ -108,7 +108,7 @@ class Navigation:
                 map_id += 1
 
     def get(self, x, y)-> NavMapData:
-        if x < 0 or x > self.area_count_x or y < 0 or y > self.area_count_y:
+        if x < 0 or x >= self.area_count_x or y < 0 or y >= self.area_count_y:
           return None
         return self._map[y][x]
       
@@ -214,14 +214,13 @@ height = 13
 path = "F:\\MyGame\\RPGMAKER_MV_GAME\\data\\"
 json_data = None
 navigation = Navigation()
+events_count = (width * 2 + height * 2) - 8
 
 for navData in navigation:
-  events_count = (width * 2 + height * 2) - 8
   # left- right- up- down
   events = [copy.deepcopy(teleport_event) for _ in range(events_count)]
   set_events_data(events, navData)
   events.insert(0,None)
-
 
   file = path + navData.file_name
 

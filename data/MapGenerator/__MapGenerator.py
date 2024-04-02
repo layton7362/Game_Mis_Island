@@ -1,3 +1,6 @@
+# Generate all Chess Maps. 
+# WARNING: DELETE EVERYTHING OF THE MAPS, IF THEY ALREARY EXIST !!!!!!!!!!!!!!!!
+
 import json
 import os 
 
