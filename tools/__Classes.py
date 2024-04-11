@@ -35,12 +35,12 @@ class RPGMakerMap:
     @staticmethod
     def load_maps(min: int, max:int) -> List[RPGMakerMap]:
         maps : List[RPGMakerMap] = []
-        for id in range(min,max+1):
+        for id in range(min,max):
+            
             map = RPGMakerMap(id)
-            # TODO FIX Naming problem.
-            # Parent folder map should only have one letter as name but currently, it has copy the last one
-            # if len(map.name) == 1:
-                # continue
+            # Parent folder map should only have one letter
+            if len(map.name) == 1:
+                continue
             
             if map._data:
                 maps.append(map)

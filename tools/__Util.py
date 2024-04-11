@@ -8,10 +8,10 @@ MAP_HEIGHT = 13
 MAP_WIDTH = 17
 MAP_TILES_COUNT = MAP_HEIGHT * MAP_WIDTH
 
-AREA_OFFSET = 5
+AREA_OFFSET = 4
 AREAS_COUNT_X  = AREAS_COUNT_Y = 26
 AREAS_COUNT = AREAS_COUNT_X * AREAS_COUNT_Y
-
+AREAS_COUNT_AND_LETTER = AREAS_COUNT + AREAS_COUNT_Y
 def padZero(value, size = 3):
     value_str = str(value)
     while len(value_str) < size:
