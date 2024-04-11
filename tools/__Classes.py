@@ -1,20 +1,83 @@
 from __Util import *
 from typing import List
 import json
+import re
+from dataclasses import dataclass, asdict
 
 class TileIDBase:
     ...
 
+class RPGMakerMap:
+    ...
 
+@dataclass
 class Event:
+    @dataclass
+    class Page:
+        @dataclass
+        class Conditions:
+            
+            def __init__(self, conditions) -> None:
+                self.actorId = conditions["actorId"]
+                self.actorValid = conditions["actorValid"]
+                self.itemId = conditions["itemId"]
+                self.itemValid = conditions["itemValid"]
+                self.selfSwitchCh = conditions["selfSwitchCh"]
+                self.selfSwitchValid = conditions["selfSwitchValid"]
+                self.switch1Id = conditions["switch1Id"]
+                self.switch1Valid = conditions["switch1Valid"]
+                self.switch2Id = conditions["switch2Id"]
+                self.switch2Valid = conditions["switch2Valid"]   
+                self.variableId = conditions["variableId"]        
+                self.variableValid = conditions["variableValid"]    
+                self.variableValue = conditions["variableValue"]   
+                
+        def __init__(self, data) -> None:
+            
+            self.conditions = Event.Page.Conditions(data["conditions"])
+            self.directionFix = data["directionFix"]
+            self.image = data["image"]
+            self.list = data["list"]
+            self.moveFrequency = data["moveFrequency"]
+            self.moveRoute = data["moveRoute"]
+            self.moveSpeed = data["moveSpeed"]
+            self.moveType = data["moveType"]
+            self.priorityType = data["priorityType"]
+            self.stepAnime = data["stepAnime"]
+            self.through = data["through"]
+            self.trigger = data["trigger"]
+            self.walkAnime = data["walkAnime"]            
+                
     def __init__(self, id, name, note, pages, x, y) -> None:
+        
         self.id:int = id
         self.name = name
         self.note = note
-        self.pages: List = pages
         self.x:int = x
         self.y:int = y
-
+        
+        self.pages: List[Event.Page] = list()
+        for page in pages:
+            self.pages.append(Event.Page(page))
+        
+        self.check_type()
+    
+    def check_type(self):
+        type = self.name
+        if type == "":
+            raise ValueError('Event has no type!')
+        
+        match(type):
+            case "NPC":
+                pass
+            case "SEQUENCE":
+                pass
+            case _:
+                if re.match("Teleport.*", type):
+                    pass
+                else:
+                     raise TypeError('Event has wrong type!')
+        
     @classmethod
     def fromDic(cls, _dic: dict):
         if not _dic:
@@ -26,9 +89,6 @@ class Event:
         x:int = _dic["x"]
         y = _dic["y"]
         return cls(id,name,note,pages,x,y)
-
-class RPGMakerMap:
-    ...
 
 class RPGMakerMap:
     
@@ -50,6 +110,7 @@ class RPGMakerMap:
     
     def __init__(self, id) -> None:
         self._data: dict = None
+        self.id = id
         self.file_name = MAP_PREFIX + padZero(id)
         self.file_full_path = DATA_PATH + self.file_name + ".json"
         self.load()
@@ -103,8 +164,9 @@ class RPGMakerMap:
         self._data["displayName"] = self.name
         self._data["width"] = self.width
         self._data["height"] = self.height
-        
         self._data["data"] = self.layer0 + self.layer1 + self.layer2 + self.layer3 + self.layer4 + self.layer5
+        
+        # self._data["events"] = json.dumps(self.events, default=lambda o: o.__dict__)
         
         with open(self.file_full_path, 'w') as data: 
             json_string = json.dumps(self._data)
@@ -184,3 +246,7 @@ class GameOverworld:
     
     def get_map_by_name(self, name) -> RPGMakerMap:
         return self.mapsByName[name]
+
+
+
+
