@@ -1,5 +1,7 @@
-# import json
+import json
 # # from typing import List
+ 
+ 
  
 DATA_PATH = "F:\\MyGame\\RPGMAKER_MV_GAME\\data\\"
 MAP_PREFIX = "Map"
@@ -18,3 +20,8 @@ def padZero(value, size = 3):
         value_str = '0' + value_str
     return value_str
 
+def toJson(data) -> str:
+    return json.dumps(data, default=lambda o : o.__dict__)
+
+def toDict(json_data) -> dict:
+    return json.loads(json_data)

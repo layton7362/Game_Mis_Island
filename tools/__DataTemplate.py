@@ -1,8 +1,9 @@
+from __Classes import *
 
-EVENT_TELEPORT = {
+EVENT_TEMPLATE = {
       "id": 1,
-      "name": "Teleport_Event",
-      "note": "",
+      "name": "NAME",
+      "note": "TYPE",
       "pages": [
         {
           "conditions": {
@@ -29,18 +30,6 @@ EVENT_TELEPORT = {
             "tileId": 0
           },
           "list": [
-            {
-              "code": 355,
-              "indent": 0,
-              "parameters": [
-                "$gamePlayer.reserveTransforMoveMap(id, x, y);"
-              ]
-            },
-            {
-              "code": 0,
-              "indent": 0,
-              "parameters": []
-            }
           ],
           "moveFrequency": 3,
           "moveRoute": {
@@ -76,3 +65,4 @@ MAP_INFO = {
           "scrollX": 0,
           "scrollY": 0
      }
+

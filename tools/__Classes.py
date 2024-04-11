@@ -10,13 +10,9 @@ class TileIDBase:
 class RPGMakerMap:
     ...
 
-@dataclass
 class Event:
-    @dataclass
     class Page:
-        @dataclass
         class Conditions:
-            
             def __init__(self, conditions) -> None:
                 self.actorId = conditions["actorId"]
                 self.actorValid = conditions["actorValid"]
@@ -31,13 +27,29 @@ class Event:
                 self.variableId = conditions["variableId"]        
                 self.variableValid = conditions["variableValid"]    
                 self.variableValue = conditions["variableValue"]   
+        class Image:
+            def __init__(self, data) -> None:
+                self.characterIndex = data["characterIndex"]
+                self.characterName = data["characterName"]
+                self.direction = data["direction"]
+                self.pattern = data["pattern"]
+                self.tileId = data["tileId"]
+        class Command:
+            def __init__(self, data) -> None:
+                self.code = data["code"]
+                self.indent = data["indent"]
+                self.parameters = data["parameters"]
                 
         def __init__(self, data) -> None:
             
             self.conditions = Event.Page.Conditions(data["conditions"])
             self.directionFix = data["directionFix"]
-            self.image = data["image"]
-            self.list = data["list"]
+            self.image = Event.Page.Image(data["image"])
+            
+            self.list : List[Event.Page.Command] = []
+            for l in data["list"]:
+                self.list.append(Event.Page.Command(l))
+                
             self.moveFrequency = data["moveFrequency"]
             self.moveRoute = data["moveRoute"]
             self.moveSpeed = data["moveSpeed"]
@@ -48,19 +60,23 @@ class Event:
             self.trigger = data["trigger"]
             self.walkAnime = data["walkAnime"]            
                 
-    def __init__(self, id, name, note, pages, x, y) -> None:
+    def __init__(self, data) -> None:
         
-        self.id:int = id
-        self.name = name
-        self.note = note
-        self.x:int = x
-        self.y:int = y
+        self.id = data["id"]
+        self.name = data["name"]
+        self.note = data["note"]
+        self.x = data["x"]
+        self.y = data["y"]
         
         self.pages: List[Event.Page] = list()
-        for page in pages:
+        for page in data["pages"]:
             self.pages.append(Event.Page(page))
         
         self.check_type()
+    
+    def set_pos(self, x,y):
+        self.x = x
+        self.y = y
     
     def check_type(self):
         type = self.name
@@ -79,16 +95,10 @@ class Event:
                      raise TypeError('Event has wrong type!')
         
     @classmethod
-    def fromDic(cls, _dic: dict):
-        if not _dic:
+    def fromDic(cls, data: dict):
+        if not data:
             return None
-        id:int = _dic["id"]
-        name = _dic["name"]
-        note = _dic["note"]
-        pages: List = _dic["pages"]
-        x:int = _dic["x"]
-        y = _dic["y"]
-        return cls(id,name,note,pages,x,y)
+        return cls(data)
 
 class RPGMakerMap:
     
@@ -101,7 +111,6 @@ class RPGMakerMap:
             # Parent folder map should only have one letter
             if len(map.name) == 1:
                 continue
-            
             if map._data:
                 maps.append(map)
             else:
@@ -113,7 +122,7 @@ class RPGMakerMap:
         self.id = id
         self.file_name = MAP_PREFIX + padZero(id)
         self.file_full_path = DATA_PATH + self.file_name + ".json"
-        self.load()
+        self.load() 
         
         self.tilesetId = self._data["tilesetId"] 
         self.name = self._data["displayName"]
@@ -160,16 +169,16 @@ class RPGMakerMap:
           assert(self._data)
           
     def save(self):
-        self._data["tilesetId"] = self.tilesetId
-        self._data["displayName"] = self.name
-        self._data["width"] = self.width
-        self._data["height"] = self.height
-        self._data["data"] = self.layer0 + self.layer1 + self.layer2 + self.layer3 + self.layer4 + self.layer5
-        
-        # self._data["events"] = json.dumps(self.events, default=lambda o: o.__dict__)
+        json_dict = {}
+        json_dict["tilesetId"] = self.tilesetId
+        json_dict["displayName"] = self.name
+        json_dict["width"] = self.width
+        json_dict["height"] = self.height
+        json_dict["data"] = self.layer0 + self.layer1 + self.layer2 + self.layer3 + self.layer4 + self.layer5
+        json_dict["events"] = self.events
         
         with open(self.file_full_path, 'w') as data: 
-            json_string = json.dumps(self._data)
+            json_string = toJson(json_dict)
             data.write(json_string)
     
     def clear_shadows(self):
@@ -194,7 +203,7 @@ class RPGMakerMap:
         layer = getattr(self, f'layer{layer_id}')
         layer[tile_id] = val
     
-    def get_events(self) -> Event:
+    def get_events(self) -> List[Event]:
         events_dic = self._data["events"]
         events: List[Event] = []
         for event_dic in events_dic:
@@ -205,7 +214,6 @@ class RPGMakerMap:
     def tileId_by_local(self, x, y):
         return y * self.width + x
     
-        
 class GameOverworld:
     # add with +4, because the MapId begins with 4
     OFFSET = 4
@@ -247,6 +255,13 @@ class GameOverworld:
     def get_map_by_name(self, name) -> RPGMakerMap:
         return self.mapsByName[name]
 
-
-
+if __name__ == "__main__":
+    map = RPGMakerMap(5)
+    events: List[Event] = map.events
+    for event in events:
+        if event:
+            event.note = "Teleport"
+    
+    map.save()
+    pass
 
