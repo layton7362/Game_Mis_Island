@@ -2,6 +2,10 @@
 // rpg_managers.js v1.6.2
 //=============================================================================
 
+/* global Test */
+/// <reference path="rpg_core.js" />
+
+
 //-----------------------------------------------------------------------------
 // DataManager
 //
@@ -1178,20 +1182,27 @@ AudioManager.playBgm = function(bgm, pos) {
     } else {
         this.stopBgm();
         if (bgm.name) { 
-            if(Decrypter.hasEncryptedAudio && this.shouldUseHtml5Audio()){
-                this.playEncryptedBgm(bgm, pos);
-            }
-            else {
-                this._bgmBuffer = this.createBuffer('bgm', bgm.name);
-                this.updateBgmParameters(bgm);
-                if (!this._meBuffer) {
-                    this._bgmBuffer.play(true, pos || 0);
-                }
+            this._bgmBuffer = this.createBuffer('bgm', bgm.name);
+            this.updateBgmParameters(bgm);
+            if (!this._meBuffer) {
+                this._bgmBuffer.play(true, pos || 0);
             }
         }
     }
     this.updateCurrentBgm(bgm, pos);
 };
+
+AudioManager.LowPassFilter = function(value){
+    if (!AudioManager._bgmBuffer.hasLowPassFilterNode()){
+        AudioManager._bgmBuffer.addLowPassFilterNode(value)
+    }
+}
+
+AudioManager.HighPassFilter = function(value){
+    if (!AudioManager._bgmBuffer.hasHighPassFilterNode()){
+        AudioManager._bgmBuffer.addHighPassFilterNode(value)
+    }
+}
 
 AudioManager.playEncryptedBgm = function(bgm, pos) {
     var ext = this.audioFileExt();
@@ -1464,13 +1475,7 @@ AudioManager.makeEmptyAudioObject = function() {
 AudioManager.createBuffer = function(folder, name) {
     var ext = this.audioFileExt();
     var url = this._path + folder + '/' + encodeURIComponent(name) + ext;
-    if (this.shouldUseHtml5Audio() && folder === 'bgm') {
-        if(this._blobUrl) Html5Audio.setup(this._blobUrl);
-        else Html5Audio.setup(url);
-        return Html5Audio;
-    } else {
-        return new WebAudio(url);
-    }
+    return new WebAudio(url);
 };
 
 AudioManager.updateBufferParameters = function(buffer, configVolume, audio) {

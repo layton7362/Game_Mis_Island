@@ -191,8 +191,16 @@ Utils.RPGMAKER_VERSION = "1.6.1";
  * @return {Boolean} True if the option is in the query string
  */
 Utils.isOptionValid = function(name) {
-    if (location.search.slice(1).split('&').contains(name)) {return 1;};
-    if (typeof nw !== "undefined" && nw.App.argv.length > 0 && nw.App.argv[0].split('&').contains(name)) {return 1;};
+
+    if (location.search.slice(1).split('&').contains(name)) 
+    {
+        return 1;
+    };
+
+    if (typeof nw !== "undefined" && nw.App.argv.length > 0 && nw.App.argv[0].split('&').contains(name)) 
+    {
+        return 1;
+    };
     return 0;
 };
 
@@ -750,7 +758,6 @@ Bitmap._reuseImages = [];
  *
  */
 
-
 Bitmap.prototype._createCanvas = function(width, height){
     this.__canvas = this.__canvas || document.createElement('canvas');
     this.__context = this.__canvas.getContext('2d');
@@ -767,7 +774,7 @@ Bitmap.prototype._createCanvas = function(width, height){
 
         this.__context.drawImage(this._image, 0, 0);
     }
-
+    
     this._setDirty();
 };
 
@@ -5533,7 +5540,7 @@ ShaderTilemap.prototype.constructor = ShaderTilemap;
 // we need this constant for some platforms (Samsung S4, S5, Tab4, HTC One H8)
 PIXI.glCore.VertexArrayObject.FORCE_NATIVE = true;
 PIXI.settings.GC_MODE = PIXI.GC_MODES.AUTO;
-PIXI.tilemap.TileRenderer.SCALE_MODE = PIXI.SCALE_MODES.NEAREST;
+PIXI.tilemap.TileRenderer.SCALE_MODE = PIXI.SCALE_MODES.LINEAR;
 PIXI.tilemap.TileRenderer.DO_CLEAR = true;
 
 /**
@@ -7726,6 +7733,7 @@ WebAudio.prototype.initialize = function(url) {
     }
     this._load(url);
     this._url = url;
+    
 };
 
 WebAudio._masterVolume   = 1;
@@ -7805,7 +7813,7 @@ WebAudio.setMasterVolume = function(value) {
 WebAudio._createContext = function() {
     try {
         if (typeof AudioContext !== 'undefined') {
-            this._context = new AudioContext();
+            this._context = new AudioContext(); 
         } else if (typeof webkitAudioContext !== 'undefined') {
             this._context = new webkitAudioContext();
         }
@@ -7953,6 +7961,7 @@ WebAudio._fadeOut = function(duration) {
     }
 };
 
+
 /**
  * Clears the audio data.
  *
@@ -7961,8 +7970,8 @@ WebAudio._fadeOut = function(duration) {
 WebAudio.prototype.clear = function() {
     this.stop();
     this._buffer = null;
-    this._sourceNode = null;
     this._gainNode = null;
+    this._sourceNode = null;
     this._pannerNode = null;
     this._totalTime = 0;
     this._sampleRate = 0;
@@ -8255,8 +8264,8 @@ WebAudio.prototype._startPlaying = function(loop, offset) {
     this._connectNodes();
     this._sourceNode.loop = loop;
     this._sourceNode.start(0, offset);
-    this._startTime = WebAudio._context.currentTime - offset / this._pitch;
-    this._createEndTimer();
+    // this._startTime = WebAudio._context.currentTime - offset / this._pitch;
+    // this._createEndTimer();
 };
 
 /**
@@ -8277,15 +8286,53 @@ WebAudio.prototype._createNodes = function() {
     this._updatePanner();
 };
 
-/**
- * @method _connectNodes
- * @private
- */
 WebAudio.prototype._connectNodes = function() {
+
+    // this.oscillator = WebAudio._context.createOscillator();
+    // this.oscillator.type = "square";
+    // this.oscillator.frequency.setValueAtTime(523.25, WebAudio._context.currentTime); // value in hertz
+    // this.oscillator.connect(this._gainNode);
+    // this.oscillator.start()
+    
     this._sourceNode.connect(this._gainNode);
     this._gainNode.connect(this._pannerNode);
     this._pannerNode.connect(WebAudio._masterGainNode);
 };
+
+WebAudio.prototype.addHighPassFilterNode = function(value){
+    if (!this.hasHighPassFilterNode){
+        this._highPassfilterNode = WebAudio._context.createBiquadFilter();
+        this._highPassfilterNode.type = 'highpass';
+        this._sourceNode.disconnect()
+        this._sourceNode.connect(this._highPassfilterNode);
+        this._highPassfilterNode.connect(this._gainNode)
+    }
+    this._highPassfilterNode.frequency.value = value;
+}
+
+WebAudio.prototype.hasHighPassFilterNode = function(){
+    return this._highPassfilterNode != null
+}
+
+WebAudio.prototype.addLowPassFilterNode = function(value = 1000){
+    if (!this.hasLowPassFilterNode()){
+        this._lowPassfilterNode = WebAudio._context.createBiquadFilter();
+        this._lowPassfilterNode.type = 'lowpass';
+        this._sourceNode.disconnect()
+        this._sourceNode.connect(this._lowPassfilterNode);
+        this._lowPassfilterNode.connect(this._gainNode)
+    }
+    this._lowPassfilterNode.frequency.value = value;
+}
+
+WebAudio.prototype.hasLowPassFilterNode = function(){
+    return this._lowPassfilterNode != null
+}
+
+/**
+ * @method _connectNodes
+ * @private
+ */
 
 /**
  * @method _removeNodes
@@ -8297,6 +8344,7 @@ WebAudio.prototype._removeNodes = function() {
         this._sourceNode = null;
         this._gainNode = null;
         this._pannerNode = null;
+        this._lowPassfilterNode = null
     }
 };
 

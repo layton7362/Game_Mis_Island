@@ -1,6 +1,6 @@
 import json
 import copy
-from __Common import MAP_TILES_COUNT, DATA_PATH 
+from tools.__Util import MAP_TILES_COUNT, DATA_PATH 
 from __Classes import Navigation, NavMapData
 from __DataTemplate import EVENT_TELEPORT as teleport_event
 

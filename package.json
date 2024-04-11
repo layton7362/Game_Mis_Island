@@ -1,13 +1,26 @@
 {
-    "name": "",
+    "name": "Game",
     "main": "index.html",
+    "node-main": "js/__module",
     "js-flags": "--expose-gc",
-    "chromium-args": "--remote-debugging-port=9222",
     "window": {
         "title": "",
         "toolbar": false,
         "width": 816,
         "height": 624,
         "icon": "icon/icon.png"
+    },
+    "dependencies": {
+        "three": "^0.163.0"
+    },
+    "devDependencies": {
+        "vite": "^5.2.8"
+    },
+    "type": "commonjs",
+    "scripts": {
+        "debug": "nw --remote-debugging-port=9222 .",
+        "start": "nw ."
     }
+    
+    
 }

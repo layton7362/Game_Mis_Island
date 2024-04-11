@@ -7,6 +7,32 @@
 //
 // The superclass of all windows within the game.
 
+
+// class Window_Base extends Window{
+
+    // _iconWidth  = 32;
+    // _iconHeight = 32;
+    // _faceWidth  = 144;
+    // _faceHeight = 144;
+
+//    constructor(params) {
+//         this.initialize.apply(this, arguments);  
+//     }   
+
+//     initialize(x, y, width, height) {
+//         Window.prototype.initialize.call(this);
+//         this.loadWindowskin();
+//         this.move(x, y, width, height);
+//         this.updatePadding();
+//         this.updateBackOpacity();
+//         this.updateTone();
+//         this.createContents();
+//         this._opening = false;
+//         this._closing = false;
+//         this._dimmerSprite = null;
+//     };
+// };
+
 function Window_Base() {
     this.initialize.apply(this, arguments);
 }
@@ -26,7 +52,6 @@ Window_Base.prototype.initialize = function(x, y, width, height) {
     this._closing = false;
     this._dimmerSprite = null;
 };
-
 Window_Base._iconWidth  = 32;
 Window_Base._iconHeight = 32;
 Window_Base._faceWidth  = 144;
@@ -591,9 +616,9 @@ Window_Base.prototype.drawActorTp = function(actor, x, y, width) {
 
 Window_Base.prototype.drawActorSimpleStatus = function(actor, x, y, width) {
     var lineHeight = this.lineHeight();
-    var x2 = x + 180;
+    var x2 = x + 10;
     var width2 = Math.min(200, width - 180 - this.textPadding());
-    this.drawActorIcons(actor, x, y + lineHeight * 2);
+    // this.drawActorIcons(actor, x, y + lineHeight * 2);
     this.drawActorName(actor, x2, y);
     this.drawActorHp(actor, x2, y + lineHeight * 1, width2);
     this.drawActorMp(actor, x2, y + lineHeight * 2, width2);
@@ -1642,12 +1667,11 @@ Window_MenuStatus.prototype.initialize = function(x, y) {
 };
 
 Window_MenuStatus.prototype.windowWidth = function() {
-    return Graphics.boxWidth - 440;
+    return 300;
 };
 
 Window_MenuStatus.prototype.windowHeight = function() {
     return 400;
-    // return Graphics.boxHeight ;
 };
 
 Window_MenuStatus.prototype.maxItems = function() {
@@ -1661,12 +1685,6 @@ Window_MenuStatus.prototype.itemHeight = function() {
 
 Window_MenuStatus.prototype.numVisibleRows = function() {
     return 4;
-};
-
-Window_MenuStatus.prototype.loadImages = function() {
-    $gameParty.members().forEach(function(actor) {
-        ImageManager.reserveFace(actor.faceName());
-    }, this);
 };
 
 Window_MenuStatus.prototype.drawItem = function(index) {
@@ -1684,7 +1702,7 @@ Window_MenuStatus.prototype.itemRect = function(index) {
     const PADDING = 30
     var rect = new Rectangle();
     var maxCols = this.maxCols();
-    rect.width = this.itemWidth();
+    rect.width = this.itemWidth() + 100;
     rect.height = this.itemHeight() + PADDING;
     rect.x = index % maxCols * (rect.width + this.spacing()) - this._scrollX;
     rect.y = Math.floor(index / maxCols) * rect.height - this._scrollY;

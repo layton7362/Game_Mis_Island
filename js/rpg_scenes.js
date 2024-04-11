@@ -63,7 +63,10 @@ Scene_Base.prototype.detachReservation = function() {
  * @instance 
  * @memberof Scene_Base
  */
+
+
 Scene_Base.prototype.create = function() {
+
 };
 
 /**
@@ -598,8 +601,17 @@ Scene_Map.prototype.update = function() {
         this.updateEncounterEffect();
     }
     this.updateWaitCount();
+
+    // if (Input.isTriggered("e")){
+    if (Input.isPressed("e")){
+        // this.saveCanvasImage()
+        AudioManager.HighPassFilter(5500)
+    }
+
     Scene_Base.prototype.update.call(this);
 };
+
+
 
 Scene_Map.prototype.updateMainMultiply = function() {
     this.updateMain();
@@ -885,6 +897,21 @@ Scene_Map.prototype.startFlashForEncounter = function(duration) {
 Scene_Map.prototype.encounterEffectSpeed = function() {
     return 1;
 };
+
+Scene_Map.prototype.saveCanvasImage = function(){
+    var canvas = document.getElementById('GameCanvas');
+    var dataURL = canvas.toDataURL('image/png');
+  
+    var link = document.createElement('a');
+    link.href = dataURL;
+    link.download = "Image.png";
+    document.body.appendChild(link);
+    link.click();
+    setTimeout(function() {
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(dataURL);  
+    }, 0); 
+  }
 
 //-----------------------------------------------------------------------------
 // Scene_MenuBase

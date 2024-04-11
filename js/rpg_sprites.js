@@ -196,7 +196,7 @@ Sprite_Character.prototype.initialize = function(character) {
 
 Sprite_Character.prototype.initMembers = function() {
     this.anchor.x = 0.5;
-    this.anchor.y = 1;
+    this.anchor.y = 1.2;
     this._character = null;
     this._balloonDuration = 0;
     this._tilesetId = 0;

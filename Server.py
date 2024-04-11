@@ -1,14 +1,14 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 
 # Definiere den Port, auf dem der Server laufen soll
-port = 8000
+port = 8080
 
 # Erstelle eine Klasse, die SimpleHTTPRequestHandler erweitert, um die Dateien zu servieren
 class CustomHandler(SimpleHTTPRequestHandler):
     # Überschreibe die Methode do_GET, um die index.html zu servieren
     def do_GET(self):
         if self.path == '/':
-            self.path = '/index.html'  # Weise den Pfad der index.html zu
+            self.path = './index.html'  # Weise den Pfad der index.html zu
         return SimpleHTTPRequestHandler.do_GET(self)
 
 # Erstelle den Server

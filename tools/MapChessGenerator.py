@@ -2,8 +2,8 @@
 # WARNING: DELETE EVERYTHING OF THE MAPS, IF THEY ALREARY EXIST !!!!!!!!!!!!!!!!
 
 import json
-from __Common import padZero, MAP_PREFIX
-from __Common import DATA_PATH as data_path
+from tools.__Util import padZero, MAP_PREFIX
+from tools.__Util import DATA_PATH as data_path
 from __DataTemplate import MAP_INFO
 
 def create_parent_map(letter):

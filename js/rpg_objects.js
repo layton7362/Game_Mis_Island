@@ -7285,7 +7285,7 @@ Game_Character.prototype.findDirectionTo = function(goalX, goalY) {
     var openList = [];
     var closedList = [];
     var start = {};
-    var best = start;
+    var best = start;   
 
     if (this.x === goalX && this.y === goalY) {
         return 0;
@@ -7390,7 +7390,7 @@ Game_Character.prototype.findDirectionTo = function(goalX, goalY) {
 
     return 0;
 };
-
+ // TODO REMOVE
 Game_Character.prototype.findDirection8To = function(goalX, goalY) {
     var searchLimit = this.searchLimit();
     var mapWidth = $gameMap.width();
