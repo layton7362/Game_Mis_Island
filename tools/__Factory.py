@@ -21,7 +21,7 @@ def createTeleportChessEvent(goal_pos: Tuple[int,int], goal_id):
     event.pages[0].list.append(evEnd)
     return event 
 
-def createNPC(event_pos: Tuple[int,int], text: str):
+def createNPC(text: str):
     event: Event = Event(EVENT_TEMPLATE)
     event.name = "NPC_NAME"
     event.note = "NPC"
@@ -55,6 +55,4 @@ def createNPC(event_pos: Tuple[int,int], text: str):
     event.pages[0].priorityType = 1 
     event.pages[0].trigger = 0 
     
-    event.x = event_pos[0]
-    event.y = event_pos[1]
     return event 

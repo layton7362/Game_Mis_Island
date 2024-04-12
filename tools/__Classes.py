@@ -1,5 +1,5 @@
 from __Util import *
-from typing import List
+from typing import List, Tuple
 import json
 import re
 from dataclasses import dataclass, asdict
@@ -289,6 +289,17 @@ class GameOverworld:
         
         return n
 
+    def add_event(self, pos: Tuple[int,int] ,event: Event):
+        x = pos[0]
+        y = pos[1]
+        local = self.get_local_by_global(x,y)
+        map = self.get_map_by_global(x,y)
+        event.x = local["x"]
+        event.y = local["y"]
+        map.events.append(event)
+        map.save()
+        pass
+    
 if __name__ == "__main__":
     # map = RPGMakerMap(5)
     # events: List[Event] = map.events

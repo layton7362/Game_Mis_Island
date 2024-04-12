@@ -14,6 +14,10 @@ AREA_OFFSET = 4
 AREAS_COUNT_X  = AREAS_COUNT_Y = 26
 AREAS_COUNT = AREAS_COUNT_X * AREAS_COUNT_Y
 AREAS_COUNT_AND_LETTER = AREAS_COUNT + AREAS_COUNT_Y
+
+GLOBAL_X = AREAS_COUNT_X * MAP_WIDTH
+GLOBAL_Y = AREAS_COUNT_Y * MAP_HEIGHT
+
 def padZero(value, size = 3):
     value_str = str(value)
     while len(value_str) < size:

@@ -4,7 +4,8 @@ from __Classes import *
 from __Util import MAP_WIDTH
 import json 
 from __Factory import * 
- 
+import random
+
 class TileIDBase:
     ID_NONE = 0
 
@@ -179,8 +180,15 @@ if __name__ == "__main__":
     #     map.fill_layer(0, TileId01.ID_GRAS)
     #     map.save()
         
-    event = createNPC((10,8),"Ich    bin ein Test")
-    map = world.get_map(0,0)
-    map.events.append(event)
-    map.save()
+    for i in range(5000):
+        x = random.randint(0, GLOBAL_X-1)
+        y = random.randint(0,GLOBAL_Y-1)
+        event = createNPC("Ich    bin ein Test")
+        world.add_event((x,y),event)
+
+    
+    
+    # map = world.get_map(0,0)
+    # map.events.append(event)
+    # map.save()
     
