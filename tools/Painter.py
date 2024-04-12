@@ -180,7 +180,7 @@ if __name__ == "__main__":
     #     map.fill_layer(0, TileId01.ID_GRAS)
     #     map.save()
         
-    for i in range(5000):
+    for i in range(2):
         x = random.randint(0, GLOBAL_X-1)
         y = random.randint(0,GLOBAL_Y-1)
         event = createNPC("Ich    bin ein Test")

@@ -21,22 +21,14 @@ def createTeleportChessEvent(goal_pos: Tuple[int,int], goal_id):
     event.pages[0].list.append(evEnd)
     return event 
 
-def createNPC(text: str):
+def createNPC(msgs: List[str]):
     event: Event = Event(EVENT_TEMPLATE)
     event.name = "NPC_NAME"
     event.note = "NPC"
-    ev0 = Event.Page.Command({
-        "code": 101,
-        "indent": 0,
-        "parameters": [
-            "",0,0,2    
-        ]
-    })
-    ev1 = Event.Page.Command({
-        "code": 401,
-        "indent": 0,
-        "parameters": [text]
-    })
+    
+    for msg in msgs:
+        addMessageCommand(event.pages[0], msg)
+        
     evEnd = Event.Page.Command({
         "code": 0,
         "indent": 0,
@@ -56,3 +48,20 @@ def createNPC(text: str):
     event.pages[0].trigger = 0 
     
     return event 
+
+
+def addMessageCommand(page: Event.Page, msg):
+    ev0 = Event.Page.Command({
+        "code": 101,
+        "indent": 0,
+        "parameters": [
+            "",0,0,2    
+        ]
+    })
+    ev1 = Event.Page.Command({
+        "code": 401,
+        "indent": 0,
+        "parameters": [msg]
+    })
+    page.list.append(ev0)
+    page.list.append(ev1)
