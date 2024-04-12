@@ -157,38 +157,13 @@ class Stamp():
     pass
 
 if __name__ == "__main__":
-    
-    maps = RPGMakerMap.load_maps(AREA_OFFSET, AREAS_COUNT_AND_LETTER + AREA_OFFSET)
-    world =  GameOverworld(maps)
-    # center = (22,22)
-    # Draw.circle(center,5,world,TileId01.ID_GRAS)
-    # Draw.circle(center,4,world,TileId01.ID_SAND)
-    # Draw.circle(center,3,world,TileId01.ID_GRAS)
-    # Draw.circle(center,2,world,TileId01.ID_SAND)
-    
-    # Draw.rect(0,
-    #           AREAS_COUNT_Y * MAP_HEIGHT - 2, 
-    #           AREAS_COUNT_X * MAP_WIDTH,  
-    #           AREAS_COUNT_Y * MAP_HEIGHT, 
-    #           world,
-    #           TileId01.ID_WATER,
-    #           0
-    #           )
-    
-    # for x in range(4, 26):
-    #     map = world.get_map(x, 0)
-    #     map.fill_layer(0, TileId01.ID_GRAS)
-    #     map.save()
-        
-    for i in range(2):
-        x = random.randint(0, GLOBAL_X-1)
-        y = random.randint(0,GLOBAL_Y-1)
-        event = createNPC("Ich    bin ein Test")
+    for i in range(200):
+        x = random.randint(0, 66)
+        y = random.randint(0, 17)
+        event = createNPC([
+            "Ich  bin  ein  Test", 
+            "Lalala"
+            ])
         world.add_event((x,y),event)
-
-    
-    
-    # map = world.get_map(0,0)
-    # map.events.append(event)
-    # map.save()
+    # world.save()
     

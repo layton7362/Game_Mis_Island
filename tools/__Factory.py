@@ -34,8 +34,6 @@ def createNPC(msgs: List[str]):
         "indent": 0,
         "parameters": []
     })
-    event.pages[0].list.append(ev0)
-    event.pages[0].list.append(ev1)
     event.pages[0].list.append(evEnd)
     
     event.pages[0].image.tileId = 0

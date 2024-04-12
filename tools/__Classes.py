@@ -1,5 +1,5 @@
 from __Util import *
-from typing import List, Tuple
+from typing import List, Tuple, Set
 import json
 import re
 from dataclasses import dataclass, asdict
@@ -222,6 +222,7 @@ class GameOverworld:
         self. load_maps(maps)
         
     def init_member(self ):
+        self.save_maps: Set[RPGMakerMap] = set()
         self.map_height = MAP_HEIGHT
         self.map_width = MAP_WIDTH
         self.area_count_x = AREAS_COUNT_X
@@ -297,21 +298,17 @@ class GameOverworld:
         event.x = local["x"]
         event.y = local["y"]
         map.events.append(event)
-        map.save()
-        pass
+        
+        self.save_maps.add(map)
     
-if __name__ == "__main__":
-    # map = RPGMakerMap(5)
-    # events: List[Event] = map.events
-    # for event in events:
-    #     if event:
-    #         event.note = "Teleport"
-    # map.save()
-    
-    maps = RPGMakerMap.load_maps()
-    world = GameOverworld(maps)
-    
-    n = world.get_neighbours(maps[5])
-    
-    pass
+    def save(self):
+        for map in self.save_maps:
+            map.save()
+            
+        self.save_maps.clear()
 
+maps = RPGMakerMap.load_maps(AREA_OFFSET, AREAS_COUNT_AND_LETTER + AREA_OFFSET)
+world =  GameOverworld(maps)
+
+if __name__ == "__main__":
+    pass
