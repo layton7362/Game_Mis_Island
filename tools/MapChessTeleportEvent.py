@@ -14,44 +14,53 @@ def remove_teleport_events(events: List[Event]):
   if len(events) == 1:
     events.clear()
 
-def set_events_data(map: RPGMakerMap, world: GameOverworld):
-    i = 0
+def  set_map_teleports(map: RPGMakerMap, world: GameOverworld):
     
-    map_left = world.get_map(map.x + 1, map.y)
-    map_right = world.get_map(map.x - 1, map.y)
-    map_top = world.get_map(map.x, map.y + 1)
-    map_bottom = world.get_map(map.x, map.y - 1)
+    n = world.get_neighbours(map)
     
-    for event_y in range(1, MAP_HEIGHT-1):
-        events[i].set_pos(0, event_y)
-        events[i].name += "_LeftToRight"
-        set_event_params(map_right, MAP_WIDTH - 2, event_y, events[i].id)
-        i += 1
-        
-    event_x = MAP_WIDTH
-    for event_y in range(1,MAP_HEIGHT-1):
-        events[i].set_pos(MAP_WIDTH - 1, event_y)
-        events[i].name += "_RightToLeft"
-        set_event_params(map_left, 1, event_y, events[i].id)
-        i += 1
+    map_left = n["left"]
+    map_right = n["right"]
+    map_top = n["top"]
+    map_bottom = n["bottom"]
     
-    for event_x in range(1, MAP_WIDTH - 1):
-        events[i].set_pos(event_x,0)
-        events[i].name += "_TopToBottom"
-        set_event_params(map_bottom, event_x, MAP_HEIGHT-1, events[i].id)
-        i += 1
+    event_id = 1
+    if map_right:
+      next_map_id = map_right.id
+      for event_y in range(1, MAP_HEIGHT-1):
+          tele_event = createTeleportChessEvent((1 , event_y), next_map_id)
+          tele_event.set_pos(MAP_WIDTH - 1, event_y)
+          tele_event.name += "_LeftToRight"
+          tele_event.id = event_id 
+          map.events.append(tele_event)
+          
+    if map_left: 
+      event_x = MAP_WIDTH
+      next_map_id = map_left.id
+      for event_y in range(1,MAP_HEIGHT-1):
+          tele_event = createTeleportChessEvent((MAP_WIDTH - 2, event_y), next_map_id)
+          tele_event.set_pos(0, event_y)
+          tele_event.name += "_RightToLeft"
+          tele_event.id = event_id 
+          map.events.append(tele_event)
     
-    event_y = MAP_HEIGHT
-    for event_x in range(1,MAP_WIDTH - 1):
-        events[i].set_pos(event_x,MAP_HEIGHT-1)
-        events[i].name += "_BottomToTop"
-        set_event_params(map_top, event_x,0, events[i].id)
-        i += 1
-                
-def set_event_params(map: RPGMakerMap, x, y, new_map_id):
-  tele_event = createTeleportChessEvent((x,y), new_map_id)
-  map.events.append(tele_event)
-
+    if map_bottom: 
+      next_map_id = map_bottom.id
+      for event_x in range(1, MAP_WIDTH - 1):
+          tele_event = createTeleportChessEvent((event_x, 1), next_map_id)
+          tele_event.set_pos(event_x, MAP_HEIGHT - 1)
+          tele_event.name += "_TopToBottom"
+          tele_event.id = event_id
+          map.events.append(tele_event)
+          
+    if map_top: 
+      next_map_id = map_top.id
+      for event_x in range(1, MAP_WIDTH - 1):
+          tele_event = createTeleportChessEvent((event_x, MAP_HEIGHT - 2), next_map_id)
+          tele_event.set_pos(event_x, 0)
+          tele_event.name += "_BottomToTop"
+          tele_event.id = event_id
+          map.events.append(tele_event)
+           
 def get_code(event: Event):
    return event.pages[0].list[0].parameters[0]
  
@@ -60,14 +69,10 @@ world =  GameOverworld(maps)
 
 for map in maps:
   # left- right- up- down
-  # teleport_event = [copy.deepcopy(teleport_event) for _ in range(MAP_TILES_COUNT)]
   
   remove_teleport_events(map.events)
-  # remove_empty_teleport_events(teleport_event)
+  set_map_teleports(map, world)
   
-  set_events_data(map)
-  
-  # events.insert(0,None)
+  # map.events.insert(0,None)
 
-    
-  # map.save()
+  map.save()

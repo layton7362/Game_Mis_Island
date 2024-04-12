@@ -7568,7 +7568,7 @@ Game_Player.prototype.refresh = function() {
 Game_Player.prototype.isStopping = function() {
     if (this._vehicleGettingOn || this._vehicleGettingOff) {
         return false;
-    }
+    }   
     return Game_Character.prototype.isStopping.call(this);
 };
 

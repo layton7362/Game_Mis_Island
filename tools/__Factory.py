@@ -1,20 +1,60 @@
 from typing import List, Tuple, Set
 from __DataTemplate import *
 
-def createTeleportChessEvent(pos: Tuple[int,int], id):
+def createTeleportChessEvent(goal_pos: Tuple[int,int], goal_id):
     event: Event = Event(EVENT_TEMPLATE)
+    event.name = "Teleport_Event"
+    event.note = "Teleport"
     ev0 = Event.Page.Command({
         "code": 355,
         "indent": 0,
         "parameters": [
-            f"$gamePlayer.reserveTransforMoveMap({id}, {pos[0]}, {pos[1]});"    
+            f"$gamePlayer.reserveTransforMoveMap({goal_id}, {goal_pos[0]}, {goal_pos[1]});"    
+        ]
+    })
+    evEnd = Event.Page.Command({
+        "code": 0,
+        "indent": 0,
+        "parameters": []
+    })
+    event.pages[0].list.append(ev0)
+    event.pages[0].list.append(evEnd)
+    return event 
+
+def createNPC(event_pos: Tuple[int,int], text: str):
+    event: Event = Event(EVENT_TEMPLATE)
+    event.name = "NPC_NAME"
+    event.note = "NPC"
+    ev0 = Event.Page.Command({
+        "code": 101,
+        "indent": 0,
+        "parameters": [
+            "",0,0,2    
         ]
     })
     ev1 = Event.Page.Command({
+        "code": 401,
+        "indent": 0,
+        "parameters": [text]
+    })
+    evEnd = Event.Page.Command({
         "code": 0,
         "indent": 0,
         "parameters": []
     })
     event.pages[0].list.append(ev0)
     event.pages[0].list.append(ev1)
+    event.pages[0].list.append(evEnd)
+    
+    event.pages[0].image.tileId = 0
+    event.pages[0].image.characterName = "People3"
+    event.pages[0].image.direction = 2
+    event.pages[0].image.pattern = 2
+    event.pages[0].image.characterIndex = 4
+    
+    event.pages[0].priorityType = 1 
+    event.pages[0].trigger = 0 
+    
+    event.x = event_pos[0]
+    event.y = event_pos[1]
     return event 

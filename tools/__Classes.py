@@ -72,7 +72,7 @@ class Event:
         for page in data["pages"]:
             self.pages.append(Event.Page(page))
         
-        self.check_type()
+        # self.check_type()
     
     def set_pos(self, x,y):
         self.x = x
@@ -103,7 +103,7 @@ class Event:
 class RPGMakerMap:
     
     @staticmethod
-    def load_maps(min: int, max:int) -> List[RPGMakerMap]:
+    def load_maps(min: int = AREA_OFFSET, max:int = AREAS_COUNT_AND_LETTER + AREA_OFFSET) -> List[RPGMakerMap]:
         maps : List[RPGMakerMap] = []
         for id in range(min,max):
             
@@ -160,7 +160,6 @@ class RPGMakerMap:
         self.layer3 = self.data_tiles[self.layer_3_first_offset : self.layer_3_last_offset +1]
         self.layer4 = self.data_tiles[self.layer_4_first_offset : self.layer_4_last_offset +1]
         self.layer5 = self.data_tiles[self.layer_5_first_offset : self.layer_5_last_offset +1]
-        pass
         
     def load(self):
         with open(self.file_full_path, 'r') as data: 
@@ -254,14 +253,54 @@ class GameOverworld:
     
     def get_map_by_name(self, name) -> RPGMakerMap:
         return self.mapsByName[name]
+    
+    def get_neighbours(self, map: RPGMakerMap) -> List[RPGMakerMap]:
+        n: map = {}
+        
+        letter = ord(map.name[0])
+        number = int(map.name[1:])
+        
+        letter_rigt = letter
+        number_right = number + 1
+        
+        letter_left = letter
+        number_left = number - 1
+        
+        letter_top = letter - 1
+        number_top = number
+        
+        letter_bottom = letter + 1
+        number_bottom = number
+        
+        n_letters = [letter_left, letter_rigt, letter_bottom, letter_top]
+        n_numbers = [number_left, number_right, number_bottom, number_top]
+        n_label = ["left", "right", "bottom", "top"]
+        
+        for i in range(4):
+            c_letter = n_letters[i]
+            c_numbers = n_numbers[i]
+            
+            if c_letter < ord('A') or c_letter > ord('Z') or c_numbers < 0 or c_numbers >= AREAS_COUNT_X:
+                n[n_label[i]] = None
+            else:
+                name = chr(c_letter) + str(c_numbers)
+                map = self.get_map_by_name(name)
+                n[n_label[i]] = map
+        
+        return n
 
 if __name__ == "__main__":
-    map = RPGMakerMap(5)
-    events: List[Event] = map.events
-    for event in events:
-        if event:
-            event.note = "Teleport"
+    # map = RPGMakerMap(5)
+    # events: List[Event] = map.events
+    # for event in events:
+    #     if event:
+    #         event.note = "Teleport"
+    # map.save()
     
-    map.save()
+    maps = RPGMakerMap.load_maps()
+    world = GameOverworld(maps)
+    
+    n = world.get_neighbours(maps[5])
+    
     pass
 
